@@ -143,9 +143,9 @@ success "Build directory created."
 
 # ---------- Done ----------
 echo ""
-echo "${GREEN}${BOLD}=================================================="
+echo -e "${GREEN}${BOLD}=================================================="
 echo "  Setup complete!"
-echo "==================================================${NC}"
+echo -e "==================================================${NC}"
 echo ""
 echo -e "${BOLD}Project '${PROJECT_NAME_NEW}' is ready in:${NC} ./${TARGET_DIR}"
 echo ""

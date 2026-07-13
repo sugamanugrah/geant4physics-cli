@@ -53,6 +53,8 @@ done
 EXE_OLD="next"
 EXE_NEW="$EXE_OLD"
 
+warn "Note: If you are not familiar with Geant4, it's recommended to leave the executable name unchanged (answer N)."
+
 while true; do
   read -p "$(echo -e ${BOLD}"Do you want to change the executable name? (Y/N): "${NC})" CHANGE_EXE
   case "$CHANGE_EXE" in

@@ -17,7 +17,7 @@ Running `GEANT4PHYSICS` will:
 5. Remove the template's `.git` history so you start with a clean repo.
 6. Replace every `PROJECT_NAME` placeholder across `CMakeLists.txt`, `.mac` files, `.cc`, `.hh`, `.in`, `.out`.
 7. Rename the executable and its associated files — only if you chose to change it.
-8. Create an empty `build/` directory, ready for CMake.
+8. Create an empty `build/` directory.
 
 ---
 

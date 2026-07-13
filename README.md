@@ -26,7 +26,7 @@ Running `GEANT4PHYSICS` will:
 ### Option A — One-line install (recommended, for use on any PC)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/<your-username>/geant4physics-cli/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/sugamanugrah/geant4physics-cli/main/install.sh | bash
 ```
 
 This downloads `GEANT4PHYSICS`, places it in `~/bin`, makes it executable, and adds `~/bin` to your `PATH`. Restart your terminal (or run `source ~/.bashrc`) afterward.

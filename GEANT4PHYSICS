@@ -126,7 +126,7 @@ success "Project name updated."
 # ---------- Replace executable name (only if changed) ----------
 if [ "$EXE_NEW" != "$EXE_OLD" ]; then
   info "Renaming executable '${EXE_OLD}' -> '${EXE_NEW}'..."
-  sed -i "s/\bnext\b/${EXE_NEW}/g" CMakeLists.txt run.mac init_vis.mac vis.mac 2>/dev/null || true
+  sed -i "s/\bnext\b/${EXE_NEW}/g" CMakeLists.txt run.mac init_vis.mac vis.mac README.md 2>/dev/null || true
 
   for ext in cc in out; do
     if [ -f "${EXE_OLD}.${ext}" ]; then

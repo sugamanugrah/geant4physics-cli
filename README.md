@@ -137,26 +137,7 @@ PBB1/
 
 ---
 
-## Known issue & fix
 
-In some versions of the script, the closing green banner line prints a literal escape code instead of resetting color:
-
-```
-==================================================\033[0m
-```
-
-**Cause:** that specific line uses plain `echo` instead of `echo -e`, so the `${NC}` (color reset) escape sequence isn't interpreted.
-
-**Fix** — in the script, change:
-```bash
-echo "==================================================${NC}"
-```
-to:
-```bash
-echo -e "==================================================${NC}"
-```
-
----
 
 ## Notes
 

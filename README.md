@@ -78,7 +78,7 @@ Below is a real run — project named `PBB1`, executable name left unchanged:
 
 ```
 ==================================================
-        GEANT4PHYSICS — Project Setup
+        GEANT4PHYSICS — GEANT Project Setup
 ==================================================
 
 Enter your Project Name (e.g. MySimulation): PBB1

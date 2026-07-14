@@ -21,7 +21,7 @@ error()   { echo -e "${RED}✖${NC} $1"; }
 clear
 echo -e "${BOLD}${CYAN}"
 echo "=================================================="
-echo "        GEANT4PHYSICS — Project Setup"
+echo "       GEANT4PHYSICS — GEANT Project Setup"
 echo "=================================================="
 echo -e "${NC}"
 

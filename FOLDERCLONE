@@ -1,0 +1,110 @@
+#!/usr/bin/env bash
+# FOLDERCLONE - copy a folder, give it a new name, and replace every
+# occurrence of the old folder's name with the new name (in file
+# contents as well as file/folder names).
+#
+# Usage:
+#   FOLDERCLONE <source_folder> <new_folder_name> [old_exe_name] [new_exe_name]
+#
+# Example:
+#   FOLDERCLONE Spro Pryo
+#   (copies the "Spro" folder, names the copy "Pryo", and replaces
+#    every occurrence of "Spro" with "Pryo" inside it)
+
+set -e
+
+SRC="$1"
+NEW_FOLDER="$2"
+
+if [ -z "$SRC" ] || [ -z "$NEW_FOLDER" ]; then
+  echo "Usage: FOLDERCLONE <source_folder> <new_folder_name>"
+  echo "Example: FOLDERCLONE Spro Pryo"
+  exit 1
+fi
+
+# Old word = source folder's name, New word = new folder's name
+OLD_WORD="$(basename "$SRC")"
+NEW_WORD="$(basename "$NEW_FOLDER")"
+
+if [ ! -d "$SRC" ]; then
+  echo "Error: folder '$SRC' not found."
+  exit 1
+fi
+
+if [ -e "$NEW_FOLDER" ]; then
+  read -rp "'$NEW_FOLDER' already exists. Overwrite it? (y/N): " OW
+  if [ "${OW,,}" != "y" ]; then
+    echo "Aborted."
+    exit 0
+  fi
+  rm -rf "$NEW_FOLDER"
+fi
+
+echo "-> Copying '$SRC' into '$NEW_FOLDER'..."
+cp -r "$SRC" "$NEW_FOLDER"
+
+echo "-> Replacing '$OLD_WORD' with '$NEW_WORD' inside files..."
+# Only touch text files (skip binaries)
+grep -rlI "$OLD_WORD" "$NEW_FOLDER" 2>/dev/null | while read -r f; do
+  sed -i "s/${OLD_WORD}/${NEW_WORD}/g" "$f"
+done
+
+echo "-> Replacing '$OLD_WORD' with '$NEW_WORD' in file/folder names..."
+# Rename deepest paths first so a parent rename doesn't break child paths
+find "$NEW_FOLDER" -depth -name "*${OLD_WORD}*" | while read -r path; do
+  newpath=$(echo "$path" | sed "s/${OLD_WORD}/${NEW_WORD}/g")
+  mv "$path" "$newpath"
+done
+
+# Detect the executable (just as a suggestion) - whichever .cc/.cpp file
+# contains "int main(", its basename is shown as a hint.
+AUTO_EXE=$(grep -lE 'int[[:space:]]+main[[:space:]]*\(' "$NEW_FOLDER"/*.cc "$NEW_FOLDER"/*.cpp 2>/dev/null | head -n1)
+if [ -n "$AUTO_EXE" ]; then
+  AUTO_EXE_NAME="$(basename "$AUTO_EXE")"
+  AUTO_EXE_NAME="${AUTO_EXE_NAME%.*}"
+fi
+
+OLD_EXE_NAME="$3"
+NEW_EXE_NAME="$4"
+
+if [ -z "$OLD_EXE_NAME" ] && [ -z "$NEW_EXE_NAME" ]; then
+  # Interactive mode: ask the user
+  if [ -n "$AUTO_EXE_NAME" ]; then
+    echo "-> Detected executable (file containing main()): '$AUTO_EXE_NAME'"
+  fi
+  read -rp "Do you also want to rename the executable? (y/N): " CHANGE_EXE
+  if [ "${CHANGE_EXE,,}" = "y" ]; then
+    read -rp "Current executable name (as it is in the folder)${AUTO_EXE_NAME:+ [$AUTO_EXE_NAME]}: " OLD_EXE_NAME
+    [ -z "$OLD_EXE_NAME" ] && OLD_EXE_NAME="$AUTO_EXE_NAME"
+    read -rp "New executable name: " NEW_EXE_NAME
+  fi
+fi
+
+if [ -n "$OLD_EXE_NAME" ] && [ -n "$NEW_EXE_NAME" ]; then
+  echo "-> Renaming executable '$OLD_EXE_NAME' -> '$NEW_EXE_NAME'..."
+  find "$NEW_FOLDER" -depth -type f | while read -r path; do
+    dir=$(dirname "$path")
+    fname=$(basename "$path")
+    base="${fname%%.*}"
+    if [ "$base" = "$OLD_EXE_NAME" ]; then
+      # Replace the name inside the file's contents too
+      sed -i "s/${OLD_EXE_NAME}/${NEW_EXE_NAME}/g" "$path" 2>/dev/null || true
+      if [[ "$fname" == *.* ]]; then
+        ext="${fname#*.}"
+        newname="${NEW_EXE_NAME}.${ext}"
+      else
+        newname="${NEW_EXE_NAME}"
+      fi
+      mv "$path" "$dir/$newname"
+    fi
+  done
+  # Update any remaining references (e.g. in CMakeLists.txt or other config files)
+  grep -rlI "$OLD_EXE_NAME" "$NEW_FOLDER" 2>/dev/null | while read -r f; do
+    sed -i "s/${OLD_EXE_NAME}/${NEW_EXE_NAME}/g" "$f"
+  done
+  echo "OK: Executable renamed."
+else
+  echo "-> Skipping executable rename."
+fi
+
+echo "Done! New folder is ready at: $NEW_FOLDER"
